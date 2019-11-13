@@ -46,9 +46,16 @@ resource "aws_lb_target_group" "frontend-target-group" {
   protocol = "${var.protocol}"
   vpc_id   = "${var.vpc-id}"
 }
+resource "aws_instance" "web" {
+  ami           = "${var.ami}"
+  instance_type = "t2.micro"
 
+  tags = {
+    Name = "HelloWorld"
+  }
+}
 resource "aws_alb_target_group_attachment" "frontend-attachments" {
   count = "${length(var.no-of-frontend-attachments)}"
   target_group_arn = "${aws_lb_target_group.frontend-target-group.arn}"
-  target_id = "${element(var.no-of-frontend-attachments,count.index )}"
+  target_id = "${aws_instance.web.id}"
 }
